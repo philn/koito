@@ -181,6 +181,18 @@ func ImportWindow() (time.Time, time.Time) {
 	return globalConfig.importBefore, globalConfig.importAfter
 }
 
+func FetchImagesDuringImport() bool {
+	lock.RLock()
+	defer lock.RUnlock()
+	return globalConfig.fetchImageDuringImport
+}
+
+func BackfillMediaOnStartup() bool {
+	lock.RLock()
+	defer lock.RUnlock()
+	return globalConfig.backfillMediaOnStartup
+}
+
 func ArtistSeparators() []*regexp.Regexp {
 	lock.RLock()
 	defer lock.RUnlock()

@@ -47,6 +47,7 @@ const (
 	IMPORT_BEFORE_UNIX_ENV         = "KOITO_IMPORT_BEFORE_UNIX"
 	IMPORT_AFTER_UNIX_ENV          = "KOITO_IMPORT_AFTER_UNIX"
 	FETCH_IMAGES_DURING_IMPORT_ENV = "KOITO_FETCH_IMAGES_DURING_IMPORT"
+	BACKFILL_MEDIA_ON_STARTUP_ENV  = "KOITO_BACKFILL_MEDIA_ON_STARTUP"
 	ARTIST_SEPARATORS_ENV          = "KOITO_ARTIST_SEPARATORS_REGEX"
 	LOGIN_GATE_ENV                 = "KOITO_LOGIN_GATE"
 	FORCE_TZ                       = "KOITO_FORCE_TZ"
@@ -57,37 +58,39 @@ type config struct {
 	listenPort int
 	configDir  string
 	// baseUrl              string
-	sqliteEnabled        bool
-	databaseUrl          string
-	musicBrainzUrl       string
-	musicBrainzRateLimit int
-	logLevel             int
-	structuredLogging    bool
-	lbzRelayEnabled      bool
-	lbzRelayUrl          string
-	lbzRelayToken        string
-	defaultPw            string
-	defaultUsername      string
-	defaultTheme         string
-	disableDeezer        bool
-	disableCAA           bool
-	disableMusicBrainz   bool
-	subsonicUrl          string
-	subsonicParams       string
-	lastfmApiKey         string
-	subsonicEnabled      bool
-	skipImport           bool
-	allowedHosts         []string
-	allowAllHosts        bool
-	allowedOrigins       []string
-	disableRateLimit     bool
-	importThrottleMs     int
-	userAgent            string
-	importBefore         time.Time
-	importAfter          time.Time
-	artistSeparators     []*regexp.Regexp
-	loginGate            bool
-	forceTZ              *time.Location
+	sqliteEnabled          bool
+	databaseUrl            string
+	musicBrainzUrl         string
+	musicBrainzRateLimit   int
+	logLevel               int
+	structuredLogging      bool
+	lbzRelayEnabled        bool
+	lbzRelayUrl            string
+	lbzRelayToken          string
+	defaultPw              string
+	defaultUsername        string
+	defaultTheme           string
+	disableDeezer          bool
+	disableCAA             bool
+	disableMusicBrainz     bool
+	subsonicUrl            string
+	subsonicParams         string
+	lastfmApiKey           string
+	subsonicEnabled        bool
+	skipImport             bool
+	fetchImageDuringImport bool
+	backfillMediaOnStartup bool
+	allowedHosts           []string
+	allowAllHosts          bool
+	allowedOrigins         []string
+	disableRateLimit       bool
+	importThrottleMs       int
+	userAgent              string
+	importBefore           time.Time
+	importAfter            time.Time
+	artistSeparators       []*regexp.Regexp
+	loginGate              bool
+	forceTZ                *time.Location
 }
 
 var (
@@ -162,9 +165,10 @@ func loadConfig(getenv func(string) string, version string) (*config, error) {
 	cfg.disableRateLimit = parseBool(getenv(DISABLE_RATE_LIMIT_ENV))
 
 	cfg.structuredLogging = parseBool(getenv(ENABLE_STRUCTURED_LOGGING_ENV))
-	fetchImageDuringImport := getenv(FETCH_IMAGES_DURING_IMPORT_ENV)
-	if fetchImageDuringImport != "" {
-		return nil, fmt.Errorf(`loadConfig: %s has no effect. Images are always fetched after import`, FETCH_IMAGES_DURING_IMPORT_ENV)
+	cfg.fetchImageDuringImport = parseBool(getenv(FETCH_IMAGES_DURING_IMPORT_ENV))
+	cfg.backfillMediaOnStartup = true
+	if backfillMediaOnStartup := getenv(BACKFILL_MEDIA_ON_STARTUP_ENV); backfillMediaOnStartup != "" {
+		cfg.backfillMediaOnStartup = parseBool(backfillMediaOnStartup)
 	}
 
 	cfg.disableDeezer = parseBool(getenv(DISABLE_DEEZER_ENV))
