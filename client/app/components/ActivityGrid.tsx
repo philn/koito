@@ -68,7 +68,7 @@ export default function ActivityGrid({
     );
   }
 
-  let target = 200;
+  let target = 225;
   if (trackId !== 0) {
     target = 5;
   } else if (albumId !== 0) {
